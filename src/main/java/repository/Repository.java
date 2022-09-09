@@ -6,14 +6,17 @@ import java.sql.SQLException;
 import java.sql.Statement;
 
 public abstract class Repository {
-    private String JdbcURL = "jdbc:mysql://localhost:3306/online_school_db?" + "autoReconnect=true&useSSL=false";
+    private String JdbcURL = "jdbc:mysql://localhost:3306/";
     private String username = "root";
     private String password = "Decembrie2001";
     private Connection connection = null;
     public Statement statement = null;
 
-     public Repository() {
+
+     public Repository(String database) {
         try {
+
+            JdbcURL+=database;;
             connection = DriverManager.getConnection(JdbcURL, username, password);
             statement = connection.createStatement();
         } catch (SQLException e) {

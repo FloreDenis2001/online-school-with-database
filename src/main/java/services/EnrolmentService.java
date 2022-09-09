@@ -1,7 +1,10 @@
 package services;
 
 import exceptii.StatusException;
+import model.Course;
 import model.Enrolment;
+import model.Student;
+import repository.CourseRepo;
 import repository.EnrolmentRepo;
 
 import java.util.ArrayList;
@@ -10,22 +13,22 @@ import java.util.List;
 public class EnrolmentService {
     EnrolmentRepo enrolmentRepo;
 
-    public EnrolmentService() {
-        enrolmentRepo = new EnrolmentRepo();
+    public EnrolmentService(EnrolmentRepo enrolmentRepo1) {
+        enrolmentRepo = enrolmentRepo1;
     }
 
-    public Enrolment findById(int id) {
+    public Enrolment findByStudentId(int studentId, int courseId) {
         List<Enrolment> enrolmentList = enrolmentRepo.allEnrolment();
-        for (Enrolment x : enrolmentList) {
-            if (x.getId() == id) {
-                return x;
+        for (Enrolment x : enrolmentList)
+            if (x.getStudentId() == studentId) {
+                if (x.getCourseId() == courseId)
+                    return x;
             }
-        }
         return null;
     }
 
     public void addEnrolment(Enrolment e) throws StatusException {
-        Enrolment t = findById(e.getId());
+        Enrolment t = findByStudentId(e.getStudentId(), e.getCourseId());
         if (t == null) {
             enrolmentRepo.insert(e);
         } else {
@@ -33,8 +36,8 @@ public class EnrolmentService {
         }
     }
 
-    public void removeEnrolment(int id) throws StatusException {
-        Enrolment t = findById(id);
+    public void removeEnrolment(int studentId, int courseId) throws StatusException {
+        Enrolment t = findByStudentId(studentId, courseId);
         if (t != null) {
             enrolmentRepo.delete(t.getCreateAt().toString());
         } else {
@@ -42,32 +45,39 @@ public class EnrolmentService {
         }
     }
 
-    public void updateEnrolemnt(int id, int courseIdNou) throws StatusException {
-        Enrolment x = findById(id);
+    public void updateEnrolemnt(int studentId, int courseIdVechi, int courseIdNou) throws StatusException {
+        Enrolment x = findByStudentId(studentId, courseIdVechi);
         if (x != null) {
-            enrolmentRepo.updateEnrol(id, courseIdNou);
+            enrolmentRepo.updateEnrol(studentId, courseIdNou);
         } else {
             throw new StatusException("Enrolmentul nu exista");
         }
     }
 
-    public List<Enrolment> listOfStudentById(int id) {
-        List<Enrolment> enrolments = enrolmentRepo.allEnrolment();
-        List<Enrolment> studentEnrol=new ArrayList<>();
-        for (Enrolment t : enrolments) {
-            if (t.getStudentId() == id) {
-                studentEnrol.add(t);
+    public ArrayList<Integer> courseIds(Student student) {
+        List<Enrolment> enrolmentList = enrolmentRepo.allEnrolment();
+        ArrayList<Integer> courses = new ArrayList<>();
+        for (Enrolment x : enrolmentList) {
+            if (x.getStudentId() == student.getId()) {
+                courses.add(x.getCourseId());
             }
         }
-        return studentEnrol;
+        return courses;
     }
 
-    public void removeEnrolemntByStudentId(int studentId) throws StatusException {
-        List<Enrolment> listOfStudent=listOfStudentById(studentId);
-        for(Enrolment x : listOfStudent){
-            enrolmentRepo.deleteByStudentId(x.getStudentId());
+    public void myCourses(Student student) {
+        ArrayList<Integer> c = courseIds(student);
+        int val = 0;
+        CourseRepo courseRepo = new CourseRepo("online_school_db");
+        List<Course> courses = courseRepo.allCourse();
+        for (int i = 0; i <= c.size() - 1; i++) {
+            val = c.get(i);
+            for (Course x : courses) {
+                if (x.getId() == val) {
+                    System.out.println("Name : " + x.getName() + "\nDepartment : " + x.getDepartment()+"\n");
+                }
+            }
         }
     }
-
 
 }

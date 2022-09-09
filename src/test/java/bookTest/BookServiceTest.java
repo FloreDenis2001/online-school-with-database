@@ -2,57 +2,105 @@ package bookTest;
 
 import exceptii.StatusException;
 import model.Book;
+import model.Student;
 import org.junit.jupiter.api.Test;
+import repository.BookRepo;
+import repository.StudentRepo;
 import services.BookService;
+import services.StudentService;
 
 import java.time.LocalDate;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class BookServiceTest {
-@Test
-    public void findTest(){
-    BookService bookService=new BookService();
-    assertEquals("Nina Frisk",bookService.findById(3).getBook_name());
-}
+    BookRepo bookRepo;
+    StudentRepo studentRepo;
 
-@Test
+    private BookServiceTest() {
+        bookRepo = new BookRepo("online_shop_test");
+        studentRepo = new StudentRepo("online_shop_test");
+    }
+
+    @Test
+    public void erase(){
+        bookRepo.eraseAll();
+        studentRepo.eraseAll();
+    }
+    @Test
     public void bookAddTest() throws StatusException {
-    BookService bookService=new BookService();
-    Book l=new Book(5,"Thor", LocalDate.of(2011,12,12));
-    bookService.addBook(l);
-    assertEquals("Thor",bookService.findById(23).getBook_name());
-}
+        BookService bookService = new BookService(bookRepo);
+        StudentRepo studentRepo2 = studentRepo;
+        Student x = new Student("Flore", "Denis", 14, "parola1", "denis@yahoo.com");
+        studentRepo2.insert(x);
+        Book l = new Book(1, "Thor", LocalDate.of(2011, 12, 12));
+        bookService.addBook(l);
+        assertEquals("Thor", bookService.findByName("Thor",1).getBook_name());
+        bookRepo.eraseAll();
+        studentRepo.eraseAll();
+    }
+    @Test
+    public void bookAddTestThrow() throws StatusException {
+        BookService bookService = new BookService(bookRepo);
+        StudentRepo studentRepo2 = studentRepo;
+        Student x = new Student("Flore", "Denis", 14, "parola1", "denis@yahoo.com");
+        studentRepo2.insert(x);
+        Book l = new Book(1, "Thor", LocalDate.of(2011, 12, 12));
+        bookService.addBook(l);
+        assertThrows(StatusException.class,()->bookService.addBook(l));
+        bookRepo.eraseAll();
+        studentRepo.eraseAll();
+    }
 
-//@Test
-//    public void bookAddTest2() throws StatusException{
-//    BookService bookService=new BookService();
-//    assertThrows(StatusException.class,()->bookService.addBook(new Book(5,"Thor", LocalDate.of(2011,12,12))));
-//}
+
 
     @Test
-    public void bookRemoveTest() throws StatusException{
-    BookService bookService=new BookService();
-    bookService.removeBook(5);
-    assertEquals(null,bookService.findById(5));
+    public void bookRemoveTest() throws StatusException {
+        BookService bookService = new BookService(bookRepo);
+        StudentRepo studentRepo2 = studentRepo;
+        Student x = new Student("Flore", "Denis", 14, "parola1", "denis@yahoo.com");
+        studentRepo2.insert(x);
+        Book l = new Book(1, "Thor", LocalDate.of(2011, 12, 12));
+        bookService.addBook(l);
+        bookService.removeBook("Thor",1);
+        assertEquals(null, bookService.findByName("Thor",1));
+        bookRepo.eraseAll();
+        studentRepo.eraseAll();
     }
 
     @Test
-    public void removeThrow()throws StatusException{
-    BookService bookService=new BookService();
-    assertThrows(StatusException.class,()->bookService.removeBook(100));
+    public void removeThrow() throws StatusException {
+        BookService bookService = new BookService(bookRepo);
+        assertThrows(StatusException.class, () -> bookService.removeBook("Ionut Florea",1));
+        bookRepo.eraseAll();
+        studentRepo.eraseAll();
     }
 
     @Test
-    public void updateBook() throws  StatusException{
-    BookService bookService=new BookService();
-    bookService.updateBookName(7,"Flore Denis");
-    assertEquals("Flore Denis",bookService.findById(7).getBook_name());
+    public void updateBook() throws StatusException {
+        StudentRepo studentRepo2 = studentRepo;
+        Student x = new Student("Flore", "Denis", 14, "parola1", "denis@yahoo.com");
+        studentRepo2.insert(x);
+        BookService bookService = new BookService(bookRepo);
+        Book l = new Book(1, "Thor", LocalDate.of(2011, 12, 12));
+        bookService.addBook(l);
+        bookService.updateBookName("Thor",1, "Thor 2");
+        assertEquals("Thor 2", bookService.findByName("Thor 2",1).getBook_name());
+        bookRepo.eraseAll();
+        studentRepo.eraseAll();
     }
 
     @Test
-    public void updateThrow() throws  StatusException{
-    BookService bookService=new BookService();
-    assertThrows(StatusException.class,()->bookService.updateBookName(1000,"denis"));
+    public void updateThrow() throws StatusException {
+        BookService bookService = new BookService(bookRepo);
+        assertThrows(StatusException.class, () -> bookService.updateBookName("Manuela",1, "denis"));
     }
+
+  @Test
+    public void test(){
+        BookService bookService=new BookService(bookRepo);
+        bookService.booksAvailable();
+  }
+
 }

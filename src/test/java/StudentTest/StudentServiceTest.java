@@ -1,53 +1,102 @@
 package StudentTest;
 
 import exceptii.StatusException;
+import model.Book;
 import model.Student;
 import org.junit.jupiter.api.Test;
+import repository.StudentRepo;
 import services.StudentService;
+
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class StudentServiceTest {
+    private StudentRepo studentRepo;
+
+    public StudentServiceTest() {
+        studentRepo = new StudentRepo("online_shop_test");
+    }
 
     @Test
-    public void findTest() {
-        StudentService studentService = new StudentService();
-        assertEquals(20, studentService.findById(13).getAge());
+    public void erase() {
+        studentRepo.eraseAll();
     }
 
     @Test
     public void addStudentTest() throws StatusException {
-        StudentService studentService = new StudentService();
+        StudentService studentService = new StudentService(studentRepo);
         Student x = new Student("Flore", "Denis", 21, "denis2001", "denisG@yahoo.com");
         studentService.addStudent(x);
-        assertEquals("denisG@yahoo.com", studentService.findById(32).getEmail());
+        assertEquals(21, studentService.findByEmail(x.getEmail()).getAge());
+        studentRepo.eraseAll();
     }
 
     @Test
-    public void addThrowTest() throws StatusException{
-        StudentService studentService = new StudentService();
+    public void addThrowTest() throws StatusException {
+        StudentService studentService = new StudentService(studentRepo);
         Student x = new Student("Flore", "Denis", 21, "denis2001", "denisG@yahoo.com");
-        assertThrows(StatusException.class,()->studentService.addStudent(x));
+        studentService.addStudent(x);
+        Student y = new Student("Flore", "Denis", 21, "denis2001", "denisG@yahoo.com");
+        assertThrows(StatusException.class, () -> studentService.addStudent(y));
+        studentRepo.eraseAll();
     }
 
     @Test
-    public void removeStudentTest() throws StatusException {
-        StudentService studentService = new StudentService();
-        studentService.removeStudent(studentService.findById(14));
-        assertEquals(null, studentService.findById(14));
+    public void removeTest() throws StatusException {
+        StudentService studentService = new StudentService(studentRepo);
+        Student x = new Student("Flore", "Denis", 21, "denis2001", "denisG@yahoo.com");
+        studentService.addStudent(x);
+        studentService.remove(x.getEmail());
+        assertEquals(null, studentService.findByEmail(x.getEmail()));
+        studentRepo.eraseAll();
     }
 
-   @Test
-    public void updateTest()throws StatusException{
-        StudentService studentService=new StudentService();
-        studentService.updatePassword(10,"denis2022");
-        assertEquals("denis2022",studentService.findById(10).getPassword());
-   }
+    @Test
+    public void removeTestThrow() throws StatusException {
+        StudentService studentService = new StudentService(studentRepo);
+        Student x = new Student("Flore", "Denis", 21, "denis2001", "denisG@yahoo.com");
+        studentService.addStudent(x);
+        assertThrows(StatusException.class, () -> studentService.remove("marian@yahoo.com"));
+        studentRepo.eraseAll();
+    }
 
-   @Test
-    public void updateThrowTest() throws StatusException{
-       StudentService studentService=new StudentService();
-       assertThrows(StatusException.class,()->studentService.updatePassword(100,"denis2022"));
-   }
+    @Test
+    public void updateTest() throws StatusException {
+        StudentService studentService = new StudentService(studentRepo);
+        Student x = new Student("Flore", "Denis", 21, "denis2001", "denisG@yahoo.com");
+        studentService.addStudent(x);
+        studentService.updatePassword(x.getEmail(), "parolanoua");
+        assertEquals("parolanoua", studentService.findByEmail(x.getEmail()).getPassword());
+        studentRepo.eraseAll();
+    }
 
+    @Test
+    public void updateThrowTest() throws StatusException {
+        StudentService studentService = new StudentService(studentRepo);
+        Student x = new Student("Flore", "Denis", 21, "denis2001", "denisG@yahoo.com");
+        studentService.addStudent(x);
+        assertThrows(StatusException.class, () -> studentService.updatePassword("flr@yahoo.com", "parolanoua"));
+        studentRepo.eraseAll();
+    }
+    @Test
+    public void findByEmail(){
+        StudentService studentService=new StudentService(new StudentRepo("online_school_db"));
+        Student x = studentService.findByEmail("Beverie@gmail.com");
+        assertEquals(21,x.getAge());
+    }
+
+    @Test
+    public void studentbookTest()  {
+        StudentService studentService = new StudentService(new StudentRepo("online_school_db"));
+        Student x = studentService.findByEmail("Mel@gmail.com");
+        studentService.myBooks(x);
+    }
+
+    @Test
+    public void verifyAccount(){
+        StudentService studentService=new StudentService(new StudentRepo("online_school_db"));
+        Student x = studentService.verifyAcc("denisflore","floredenis907@yahoo.com");
+        assertEquals(x,studentService.verifyAcc("denisflore","floredenis907@yahoo.com"));
+    }
 }

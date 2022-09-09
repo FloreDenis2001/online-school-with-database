@@ -6,46 +6,75 @@ import org.junit.jupiter.api.Test;
 import repository.CourseRepo;
 import services.CourseService;
 
+import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 class CourseServiceTest {
+
+    private CourseRepo courseRepo;
+
+    public CourseServiceTest() {
+
+        courseRepo = new CourseRepo("online_shop_test");
+    }
+
     @Test
-    public void findTest(){
-        CourseService courseService=new CourseService();
-        assertEquals("design",courseService.findById(9).getName());
+    public void eraseTest() {
+        courseRepo.eraseAll();
     }
 
 
     @Test
     public void addCourseTest() throws StatusException {
-        CourseService courseService=new CourseService();
-        Course x=new Course("sport","fotbal");
+        CourseService courseService = new CourseService(courseRepo);
+        Course x = new Course("sport", "fotbal");
         courseService.addCourse(x);
-        assertEquals("fotbal",courseService.findById(26).getDepartment());
-
+        assertEquals("fotbal", courseService.findByName("sport","fotbal").getDepartment());
+        courseRepo.eraseAll();
     }
-
-    // nu pot sa sterg cursul
     @Test
-    public void removeCourseTest() throws StatusException{
-        CourseService courseService=new CourseService();
-        courseService.removeCourse(courseService.findById(22));
-        assertEquals(null,courseService.findById(22));
-    }
-
-    @Test
-    public void updateTest() throws StatusException{
-        CourseService courseService=new CourseService();
-        courseService.updateDepartmentName(20,"Java Spring");
-        assertEquals("Java Spring",courseService.findById(20).getDepartment());
+    public void addCourseThrowTest() throws  StatusException{
+        CourseService courseService = new CourseService(courseRepo);
+        Course x = new Course("sport", "fotbal");
+        courseService.addCourse(x);
+        assertThrows(StatusException.class,()->courseService.addCourse(x));
+        eraseTest();
     }
 
     @Test
-    public void updateThrow() throws StatusException{
-        CourseService courseService=new CourseService();
-        assertThrows(StatusException.class,()->courseService.updateDepartmentName(512,"denis"));
+    public void removeThrowTest() throws StatusException {
+        CourseService courseService = new CourseService(courseRepo);
+        assertThrows(StatusException.class, () -> courseService.removeCourse(new Course("sport", "fotbal")));
+        eraseTest();
     }
 
+    @Test
+    public void removeCourseTest() throws StatusException {
+        CourseService courseService = new CourseService(courseRepo);
+        Course x = new Course("sport", "fotbal");
+        courseService.addCourse(x);
+        courseService.removeCourse(courseService.findByName("sport","fotbal"));
+        assertEquals(null, courseService.findByName("sport","fotbal"));
+        eraseTest();
+    }
+
+    @Test
+    public void updateTest() throws StatusException {
+        CourseService courseService = new CourseService(courseRepo);
+        Course x = new Course("sport", "fotbal");
+        courseService.addCourse(x);
+        courseService.updateDepartmentName("fotbal","sport", "golf");
+        assertEquals("golf", courseService.findByName("sport","golf").getDepartment());
+        eraseTest();
+    }
+
+    @Test
+    public void updateThrow() throws StatusException {
+        CourseService courseService = new CourseService(courseRepo);
+        assertThrows(StatusException.class, () -> courseService.updateDepartmentName("512", "denis","516"));
+        eraseTest();
+    }
 
 
 }
