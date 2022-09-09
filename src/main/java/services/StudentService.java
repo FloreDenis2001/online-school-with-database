@@ -59,11 +59,9 @@ public class StudentService {
     public void myBooks(Student student) {
         BookRepo bookRepo = new BookRepo("online_school_db");
         List<Book> books = bookRepo.allBook();
-        for (Book x : books) {
-            if (x.getStudent_id() == student.getId()) {
+        for (Book x : books)
+            if (x.getStudent_id() == student.getId())
                 System.out.println("Book Name : " + x.getBook_name() + "\nCreate At : " + x.getCreate_at() + "\n");
-            }
-        }
     }
 
     public Student verifyAcc(String password, String email) {

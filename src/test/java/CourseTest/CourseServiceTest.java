@@ -76,5 +76,15 @@ class CourseServiceTest {
         eraseTest();
     }
 
+    @Test
+    public void allcourses() throws StatusException {
+        CourseService courseService=new CourseService(courseRepo);
+        Course x = new Course("sport", "fotbal");
+        courseService.addCourse(x);
+        courseService.allCourse();
+        eraseTest();
+    }
+
+
 
 }

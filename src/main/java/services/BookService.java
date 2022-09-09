@@ -53,30 +53,18 @@ public class BookService {
         }
     }
 
-
-    public List<Book> bookList() {
-        List<Book> books = bookRepo.allBook();
-        List<Book> newList= new ArrayList<>();
-         for(Book t : books){
-             if(!newList.contains(t.getBook_name())){
-                 newList.add(t);
-             }
-         }
-         return newList;
-    }
-
     public void booksAvailable() {
         BookService bookService=new BookService(bookRepo);
-        List<Book> bookList=bookService.bookList();
+        List<Book> bookList=bookRepo.allBook();
         List<String> bookNames=new ArrayList<>();
         for(Book x :bookList)
             bookNames.add(x.getBook_name());
 
         List<String> booksWithoutDuplicates=new ArrayList<>();
         for(String x : bookNames)
-            if(!booksWithoutDuplicates.contains(x)){
+            if(!booksWithoutDuplicates.contains(x))
                 booksWithoutDuplicates.add(x);
-            }
+
 
 
         for(String x : booksWithoutDuplicates)

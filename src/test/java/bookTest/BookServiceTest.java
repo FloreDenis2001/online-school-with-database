@@ -24,10 +24,11 @@ class BookServiceTest {
     }
 
     @Test
-    public void erase(){
+    public void erase() {
         bookRepo.eraseAll();
         studentRepo.eraseAll();
     }
+
     @Test
     public void bookAddTest() throws StatusException {
         BookService bookService = new BookService(bookRepo);
@@ -36,10 +37,11 @@ class BookServiceTest {
         studentRepo2.insert(x);
         Book l = new Book(1, "Thor", LocalDate.of(2011, 12, 12));
         bookService.addBook(l);
-        assertEquals("Thor", bookService.findByName("Thor",1).getBook_name());
+        assertEquals("Thor", bookService.findByName("Thor", 1).getBook_name());
         bookRepo.eraseAll();
         studentRepo.eraseAll();
     }
+
     @Test
     public void bookAddTestThrow() throws StatusException {
         BookService bookService = new BookService(bookRepo);
@@ -48,11 +50,10 @@ class BookServiceTest {
         studentRepo2.insert(x);
         Book l = new Book(1, "Thor", LocalDate.of(2011, 12, 12));
         bookService.addBook(l);
-        assertThrows(StatusException.class,()->bookService.addBook(l));
+        assertThrows(StatusException.class, () -> bookService.addBook(l));
         bookRepo.eraseAll();
         studentRepo.eraseAll();
     }
-
 
 
     @Test
@@ -63,8 +64,8 @@ class BookServiceTest {
         studentRepo2.insert(x);
         Book l = new Book(1, "Thor", LocalDate.of(2011, 12, 12));
         bookService.addBook(l);
-        bookService.removeBook("Thor",1);
-        assertEquals(null, bookService.findByName("Thor",1));
+        bookService.removeBook("Thor", 1);
+        assertEquals(null, bookService.findByName("Thor", 1));
         bookRepo.eraseAll();
         studentRepo.eraseAll();
     }
@@ -72,7 +73,7 @@ class BookServiceTest {
     @Test
     public void removeThrow() throws StatusException {
         BookService bookService = new BookService(bookRepo);
-        assertThrows(StatusException.class, () -> bookService.removeBook("Ionut Florea",1));
+        assertThrows(StatusException.class, () -> bookService.removeBook("Ionut Florea", 1));
         bookRepo.eraseAll();
         studentRepo.eraseAll();
     }
@@ -85,8 +86,8 @@ class BookServiceTest {
         BookService bookService = new BookService(bookRepo);
         Book l = new Book(1, "Thor", LocalDate.of(2011, 12, 12));
         bookService.addBook(l);
-        bookService.updateBookName("Thor",1, "Thor 2");
-        assertEquals("Thor 2", bookService.findByName("Thor 2",1).getBook_name());
+        bookService.updateBookName("Thor", 1, "Thor 2");
+        assertEquals("Thor 2", bookService.findByName("Thor 2", 1).getBook_name());
         bookRepo.eraseAll();
         studentRepo.eraseAll();
     }
@@ -94,13 +95,25 @@ class BookServiceTest {
     @Test
     public void updateThrow() throws StatusException {
         BookService bookService = new BookService(bookRepo);
-        assertThrows(StatusException.class, () -> bookService.updateBookName("Manuela",1, "denis"));
+        assertThrows(StatusException.class, () -> bookService.updateBookName("Manuela", 1, "denis"));
     }
 
-  @Test
-    public void test(){
-        BookService bookService=new BookService(bookRepo);
+    @Test
+    public void test() throws StatusException {
+        StudentRepo studentRepo2 = studentRepo;
+        Student x = new Student("Flore", "Denis", 14, "parola1", "denis@yahoo.com");
+        studentRepo2.insert(x);
+        BookService bookService = new BookService(bookRepo);
+        Book l = new Book(1, "Thor", LocalDate.of(2011, 12, 12));
+        Book l1 = new Book(1, "Thor 2", LocalDate.of(2011, 12, 12));
+        Book l2 = new Book(1, "Thor 3", LocalDate.of(2011, 12, 12));
+        Book l3 = new Book(1, "Thor 4", LocalDate.of(2011, 12, 12));
+        bookService.addBook(l);
+        bookService.addBook(l1);
+        bookService.addBook(l2);
+        bookService.addBook(l3);
         bookService.booksAvailable();
-  }
+        bookRepo.eraseAll();
 
+    }
 }

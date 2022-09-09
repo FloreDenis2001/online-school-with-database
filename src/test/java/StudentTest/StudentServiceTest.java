@@ -3,24 +3,30 @@ package StudentTest;
 import exceptii.StatusException;
 import model.Book;
 import model.Student;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import repository.BookRepo;
 import repository.StudentRepo;
+import services.BookService;
 import services.StudentService;
 
-import java.util.List;
+import java.time.LocalDate;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class StudentServiceTest {
     private StudentRepo studentRepo;
+    private BookRepo bookRepo;
 
     public StudentServiceTest() {
         studentRepo = new StudentRepo("online_shop_test");
+        bookRepo = new BookRepo("online_shop_test");
     }
 
-    @Test
-    public void erase() {
+    @BeforeEach()
+    public void setup() {
         studentRepo.eraseAll();
+        bookRepo.eraseAll();
     }
 
     @Test
@@ -79,24 +85,42 @@ class StudentServiceTest {
         assertThrows(StatusException.class, () -> studentService.updatePassword("flr@yahoo.com", "parolanoua"));
         studentRepo.eraseAll();
     }
-    @Test
-    public void findByEmail(){
-        StudentService studentService=new StudentService(new StudentRepo("online_school_db"));
-        Student x = studentService.findByEmail("Beverie@gmail.com");
-        assertEquals(21,x.getAge());
-    }
 
     @Test
-    public void studentbookTest()  {
+    public void findByEmail() {
         StudentService studentService = new StudentService(new StudentRepo("online_school_db"));
-        Student x = studentService.findByEmail("Mel@gmail.com");
-        studentService.myBooks(x);
+        Student x = studentService.findByEmail("Beverie@gmail.com");
+        assertEquals(21, x.getAge());
     }
 
     @Test
-    public void verifyAccount(){
-        StudentService studentService=new StudentService(new StudentRepo("online_school_db"));
-        Student x = studentService.verifyAcc("denisflore","floredenis907@yahoo.com");
-        assertEquals(x,studentService.verifyAcc("denisflore","floredenis907@yahoo.com"));
+    public void studentbookTest() throws StatusException {
+        StudentService studentService = new StudentService(studentRepo);
+        Student x = new Student("Flore", "Denis", 21, "denis2001", "denisG@yahoo.com");
+        studentService.addStudent(x);
+        Student p = studentService.findByEmail("denisG@yahoo.com");
+        BookService bookService = new BookService(new BookRepo("online_shop_test"));
+        Book t = new Book(p.getId(), "Harry Poter", LocalDate.now());
+        bookService.addBook(t);
+        studentService.myBooks(p);
+
     }
+
+    @Test
+    public void verifyAccount() throws StatusException {
+        StudentService studentService = new StudentService(studentRepo);
+        Student x = new Student("Flore", "Denis", 21, "denis2001", "denisG@yahoo.com");
+        studentService.addStudent(x);
+        assertEquals(x, studentService.verifyAcc("denis2001", "denisG@yahoo.com"));
+    }
+
+    @Test
+    public void verfyAccount2() throws StatusException {
+        StudentService studentService = new StudentService(studentRepo);
+        Student x = new Student("Flore", "Denis", 21, "denis2001", "denisG@yahoo.com");
+        studentService.addStudent(x);
+        assertEquals(null,studentService.verifyAcc("denis2001","denis@yahoo.com"));
+    }
+
+
 }
